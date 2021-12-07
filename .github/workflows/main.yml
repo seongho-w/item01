@@ -1,4 +1,4 @@
-name: gyunny-action
+name: weling-action
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  S3_BUCKET_NAME: aws-gyun-s3
+  S3_BUCKET_NAME: weling
 
 jobs:
   build:
