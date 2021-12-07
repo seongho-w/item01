@@ -30,6 +30,10 @@ jobs:
         
         
       # 새로 추가 된 부분 
+      
+        env: 
+            S3_BUCKET_NAME: aws-gyun-s3
+      
       - name: Make zip file
         run: zip -r ./$GITHUB_SHA.zip .
         shell: bash
