@@ -1,38 +1,37 @@
-name: weling-action
-
 on:
   push:
     branches:
       - master
-  workflow_dispatch:
 
+name: Deploy String boot to Amazon EC2
 env:
-  S3_BUCKET_NAME: weling
+  PROJECT_NAME: weling-deploy
+  S3_BUCKET_NAME: weling-deploy
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  deploy:
+    name: DEPLOY
+    runs-on: ubuntu-18.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up JDK 11
+      - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 1.8
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x gradlew
         shell: bash
 
       - name: Build with Gradle
         run: ./gradlew build
         shell: bash
 
-      # 새로 추가 된 부분 
       - name: Make zip file
-        run: zip -r ./$GITHUB_SHA.zip .
+        run: zip -qq -r ./$GITHUB_SHA.zip .
         shell: bash
 
       - name: Configure AWS credentials
@@ -41,6 +40,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-
+        
       - name: Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://isntyet-deploy/$PROJECT_NAME/$GITHUB_SHA.zip
+
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name testapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name dev --s3-location bucket=isntyet-deploy,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
