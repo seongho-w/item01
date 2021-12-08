@@ -5,7 +5,6 @@ on:
 
 name: Deploy String boot to Amazon EC2
 env:
-  PROJECT_NAME: weling-deploy
   S3_BUCKET_NAME: weling-deploy
 
 jobs:
